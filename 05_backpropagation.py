@@ -14,6 +14,33 @@ def softmax(z):
 def cross_entropy(probs, y_true):
     return -np.log(probs[y_true] + 1e-9)
 
+def _train(X_data, y_data, W1, b1, W2, b2, epochs=40, lr=0.05, batch_size=32):
+    N = len(X_data)
+    loss_curve = []
+    for epoch in range(epochs):
+        idx = np.random.permutation(N)
+        epoch_loss = 0.0
+        for start in range(0, N, batch_size):
+            batch = idx[start:start + batch_size]
+            xb, yb = X_data[batch], y_data[batch]
+            z1b = xb @ W1 + b1
+            a1b = relu(z1b)
+            z2b = a1b @ W2 + b2
+            pb  = np.array([softmax(row) for row in z2b])
+            epoch_loss += np.mean([-np.log(pb[i, yb[i]] + 1e-9) for i in range(len(yb))])
+            dz2 = pb.copy()
+            for i, yi in enumerate(yb):
+                dz2[i, yi] -= 1
+            dz2 /= len(yb)
+            dW2 = a1b.T @ dz2; db2 = dz2.sum(0)
+            da1 = dz2 @ W2.T
+            dz1 = da1 * relu_grad(z1b)
+            dW1 = xb.T @ dz1; db1 = dz1.sum(0)
+            W1 -= lr * dW1; b1 -= lr * db1
+            W2 -= lr * dW2; b2 -= lr * db2
+        loss_curve.append(float(epoch_loss))
+    return loss_curve
+
 def main():
     text("# Backpropagation")
 
@@ -164,42 +191,8 @@ def main():
     b1 = np.zeros(8)
     W2 = np.random.randn(8, 2) * 0.3
     b2 = np.zeros(2)
-    lr = 0.05
-    batch_size = 32
-    loss_curve = []
 
-    for epoch in range(40):   # @stepover
-        idx = np.random.permutation(N)
-        epoch_loss = 0.0
-        for start in range(0, N, batch_size):
-            batch = idx[start:start + batch_size]
-            xb, yb = X_data[batch], y_data[batch]
-
-            z1b = xb @ W1 + b1
-            a1b = relu(z1b)
-            z2b = a1b @ W2 + b2
-            pb  = np.array([softmax(row) for row in z2b])
-            epoch_loss += np.mean([-np.log(pb[i, yb[i]] + 1e-9) for i in range(len(yb))])
-
-            dz2 = pb.copy()
-            for i, yi in enumerate(yb):
-                dz2[i, yi] -= 1
-            dz2 /= len(yb)
-
-            dW2 = a1b.T @ dz2
-            db2 = dz2.sum(0)
-            da1 = dz2 @ W2.T
-            dz1 = da1 * relu_grad(z1b)
-            dW1 = xb.T @ dz1
-            db1 = dz1.sum(0)
-
-            W1 -= lr * dW1
-            b1 -= lr * db1
-            W2 -= lr * dW2
-            b2 -= lr * db2
-
-        loss_curve.append(float(epoch_loss))
-
+    loss_curve = _train(X_data, y_data, W1, b1, W2, b2)  # @stepover
     final_epoch_loss = loss_curve[-1]   # @inspect final_epoch_loss
 
     plot({

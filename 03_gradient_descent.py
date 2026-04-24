@@ -5,7 +5,32 @@ def mse_loss(y_pred, y_true):
     return np.mean((y_pred - y_true) ** 2)
 
 def predict(X, w, b):
-    return X @ w + b
+    return X * w + b
+
+def _train(X, y_true, w, b, lr=0.001, steps=200):
+    history = []
+    for _ in range(steps):
+        y_pred = predict(X, w, b)
+        error = y_pred - y_true
+        w -= lr * 2 * np.mean(error * X)
+        b -= lr * 2 * np.mean(error)
+        history.append(float(mse_loss(y_pred, y_true)))
+    return w, b, history
+
+def _compare_lrs(X, y_true, learning_rates, steps=200):
+    results = {}
+    for lr_val in learning_rates:
+        np.random.seed(0)
+        w, b = np.random.randn(), np.random.randn()
+        history = []
+        for _ in range(steps):
+            y_p = predict(X, w, b)
+            e = y_p - y_true
+            w -= lr_val * 2 * np.mean(e * X)
+            b -= lr_val * 2 * np.mean(e)
+            history.append(float(mse_loss(y_p, y_true)))
+        results[lr_val] = history
+    return results
 
 def main():
     text("# Gradient Descent")
@@ -79,18 +104,7 @@ def main():
 
     text("## Training loop — watch the loss fall")
 
-    lr = 0.001    # @inspect lr
-    loss_history = []
-
-    for step in range(200):   # @stepover
-        y_pred = predict(X, w, b)
-        error = y_pred - y_true
-        grad_w = 2 * np.mean(error * X)
-        grad_b = 2 * np.mean(error)
-        w -= lr * grad_w
-        b -= lr * grad_b
-        loss_history.append(float(mse_loss(y_pred, y_true)))
-
+    w, b, loss_history = _train(X, y_true, w, b)  # @stepover
     w = float(w)    # @inspect w
     b = float(b)    # @inspect b
     final_loss = loss_history[-1]  # @inspect final_loss
@@ -122,18 +136,7 @@ def main():
         In practice: start at `1e-3`, halve it if training becomes unstable.
     """)
 
-    results = {}
-    for lr_val in [0.1, 0.01, 0.001, 0.0001]:   # @stepover
-        np.random.seed(0)
-        w2, b2 = np.random.randn(), np.random.randn()
-        history = []
-        for _ in range(200):
-            y_p = predict(X, w2, b2)
-            e = y_p - y_true
-            w2 -= lr_val * 2 * np.mean(e * X)
-            b2 -= lr_val * 2 * np.mean(e)
-            history.append(float(mse_loss(y_p, y_true)))
-        results[lr_val] = history
+    results = _compare_lrs(X, y_true, [0.1, 0.01, 0.001, 0.0001])  # @stepover
 
     plot({
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
