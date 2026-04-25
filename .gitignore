@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 _site/
 .lectrace_cache.json
+uv.lock
