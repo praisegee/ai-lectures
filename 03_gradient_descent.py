@@ -1,37 +1,6 @@
 from lectrace import text, note, plot
 import numpy as np
 
-def mse_loss(y_pred, y_true):
-    return np.mean((y_pred - y_true) ** 2)
-
-def predict(X, w, b):
-    return X * w + b
-
-def _train(X, y_true, w, b, lr=0.001, steps=200):
-    history = []
-    for _ in range(steps):
-        y_pred = predict(X, w, b)
-        error = y_pred - y_true
-        w -= lr * 2 * np.mean(error * X)
-        b -= lr * 2 * np.mean(error)
-        history.append(float(mse_loss(y_pred, y_true)))
-    return w, b, history
-
-def _compare_lrs(X, y_true, learning_rates, steps=200):
-    results = {}
-    for lr_val in learning_rates:
-        np.random.seed(0)
-        w, b = np.random.randn(), np.random.randn()
-        history = []
-        for _ in range(steps):
-            y_p = predict(X, w, b)
-            e = y_p - y_true
-            w -= lr_val * 2 * np.mean(e * X)
-            b -= lr_val * 2 * np.mean(e)
-            history.append(float(mse_loss(y_p, y_true)))
-        results[lr_val] = history
-    return results
-
 def main():
     text("# Gradient Descent")
 
@@ -172,3 +141,42 @@ def main():
         gradient clipping — is an enhancement on top of this basic loop.
         The core idea never changes.
     """)
+
+
+def mse_loss(y_pred, y_true):
+    return np.mean((y_pred - y_true) ** 2)
+
+
+def predict(X, w, b):
+    return X * w + b
+
+
+def _train(X, y_true, w, b, lr=0.001, steps=200):
+    history = []
+    for _ in range(steps):
+        y_pred = predict(X, w, b)
+        error = y_pred - y_true
+        w -= lr * 2 * np.mean(error * X)
+        b -= lr * 2 * np.mean(error)
+        history.append(float(mse_loss(y_pred, y_true)))
+    return w, b, history
+
+
+def _compare_lrs(X, y_true, learning_rates, steps=200):
+    results = {}
+    for lr_val in learning_rates:
+        np.random.seed(0)
+        w, b = np.random.randn(), np.random.randn()
+        history = []
+        for _ in range(steps):
+            y_p = predict(X, w, b)
+            e = y_p - y_true
+            w -= lr_val * 2 * np.mean(e * X)
+            b -= lr_val * 2 * np.mean(e)
+            history.append(float(mse_loss(y_p, y_true)))
+        results[lr_val] = history
+    return results
+
+
+if __name__ == "__main__":
+    main()

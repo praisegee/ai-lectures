@@ -1,28 +1,6 @@
 from lectrace import text, note, plot
 import numpy as np
 
-def relu(z):
-    return np.maximum(0, z)
-
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-def softmax(z):
-    e = np.exp(z - z.max())
-    return e / e.sum()
-
-class Linear:
-    def __init__(self, in_features, out_features, seed=None):
-        rng = np.random.default_rng(seed)
-        self.W = rng.standard_normal((in_features, out_features)) * np.sqrt(2 / in_features)
-        self.b = np.zeros(out_features)
-
-    def __call__(self, x):
-        return x @ self.W + self.b
-
-    def __lectrace__(self):
-        return {"W_shape": list(self.W.shape), "b_shape": list(self.b.shape)}
-
 def main():
     text("# Neural Networks")
 
@@ -198,3 +176,33 @@ def main():
         Nobody designs these features — the network discovers them automatically
         through training. This emergent hierarchy is what makes deep learning so powerful.
     """)
+
+
+def relu(z):
+    return np.maximum(0, z)
+
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
+def softmax(z):
+    e = np.exp(z - z.max())
+    return e / e.sum()
+
+
+class Linear:
+    def __init__(self, in_features, out_features, seed=None):
+        rng = np.random.default_rng(seed)
+        self.W = rng.standard_normal((in_features, out_features)) * np.sqrt(2 / in_features)
+        self.b = np.zeros(out_features)
+
+    def __call__(self, x):
+        return x @ self.W + self.b
+
+    def __lectrace__(self):
+        return {"W_shape": list(self.W.shape), "b_shape": list(self.b.shape)}
+
+
+if __name__ == "__main__":
+    main()

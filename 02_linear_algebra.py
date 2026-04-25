@@ -152,3 +152,7 @@ def main():
             "y": {"field": "variance", "type": "quantitative", "title": "Eigenvalue (variance explained)"},
         },
     })
+
+
+if __name__ == "__main__":
+    main()

@@ -149,3 +149,7 @@ def main():
 def compute_sum(a, b):  # @inspect
     total = a + b
     return total
+
+
+if __name__ == "__main__":
+    main()

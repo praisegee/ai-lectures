@@ -1,46 +1,6 @@
 from lectrace import text, note, plot
 import numpy as np
 
-def relu(z):
-    return np.maximum(0, z)
-
-def relu_grad(z):
-    return (z > 0).astype(float)
-
-def softmax(z):
-    e = np.exp(z - z.max())
-    return e / e.sum()
-
-def cross_entropy(probs, y_true):
-    return -np.log(probs[y_true] + 1e-9)
-
-def _train(X_data, y_data, W1, b1, W2, b2, epochs=40, lr=0.05, batch_size=32):
-    N = len(X_data)
-    loss_curve = []
-    for epoch in range(epochs):
-        idx = np.random.permutation(N)
-        epoch_loss = 0.0
-        for start in range(0, N, batch_size):
-            batch = idx[start:start + batch_size]
-            xb, yb = X_data[batch], y_data[batch]
-            z1b = xb @ W1 + b1
-            a1b = relu(z1b)
-            z2b = a1b @ W2 + b2
-            pb  = np.array([softmax(row) for row in z2b])
-            epoch_loss += np.mean([-np.log(pb[i, yb[i]] + 1e-9) for i in range(len(yb))])
-            dz2 = pb.copy()
-            for i, yi in enumerate(yb):
-                dz2[i, yi] -= 1
-            dz2 /= len(yb)
-            dW2 = a1b.T @ dz2; db2 = dz2.sum(0)
-            da1 = dz2 @ W2.T
-            dz1 = da1 * relu_grad(z1b)
-            dW1 = xb.T @ dz1; db1 = dz1.sum(0)
-            W1 -= lr * dW1; b1 -= lr * db1
-            W2 -= lr * dW2; b2 -= lr * db2
-        loss_curve.append(float(epoch_loss))
-    return loss_curve
-
 def main():
     text("# Backpropagation")
 
@@ -221,3 +181,52 @@ def main():
         175 billion forward passes per update step. Backprop does it in one.
         That's the difference between training being possible and not possible.
     """)
+
+
+def relu(z):
+    return np.maximum(0, z)
+
+
+def relu_grad(z):
+    return (z > 0).astype(float)
+
+
+def softmax(z):
+    e = np.exp(z - z.max())
+    return e / e.sum()
+
+
+def cross_entropy(probs, y_true):
+    return -np.log(probs[y_true] + 1e-9)
+
+
+def _train(X_data, y_data, W1, b1, W2, b2, epochs=40, lr=0.05, batch_size=32):
+    N = len(X_data)
+    loss_curve = []
+    for epoch in range(epochs):
+        idx = np.random.permutation(N)
+        epoch_loss = 0.0
+        for start in range(0, N, batch_size):
+            batch = idx[start:start + batch_size]
+            xb, yb = X_data[batch], y_data[batch]
+            z1b = xb @ W1 + b1
+            a1b = relu(z1b)
+            z2b = a1b @ W2 + b2
+            pb  = np.array([softmax(row) for row in z2b])
+            epoch_loss += np.mean([-np.log(pb[i, yb[i]] + 1e-9) for i in range(len(yb))])
+            dz2 = pb.copy()
+            for i, yi in enumerate(yb):
+                dz2[i, yi] -= 1
+            dz2 /= len(yb)
+            dW2 = a1b.T @ dz2; db2 = dz2.sum(0)
+            da1 = dz2 @ W2.T
+            dz1 = da1 * relu_grad(z1b)
+            dW1 = xb.T @ dz1; db1 = dz1.sum(0)
+            W1 -= lr * dW1; b1 -= lr * db1
+            W2 -= lr * dW2; b2 -= lr * db2
+        loss_curve.append(float(epoch_loss))
+    return loss_curve
+
+
+if __name__ == "__main__":
+    main()

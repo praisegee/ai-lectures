@@ -1,16 +1,6 @@
 from lectrace import text, note, plot
 import numpy as np
 
-def softmax(x, axis=-1):
-    e = np.exp(x - x.max(axis=axis, keepdims=True))
-    return e / e.sum(axis=axis, keepdims=True)
-
-def scaled_dot_product_attention(Q, K, V):
-    d_k = Q.shape[-1]
-    scores = Q @ K.T / np.sqrt(d_k)
-    weights = softmax(scores)
-    return weights @ V, weights
-
 def main():
     text("# Attention and Transformers")
 
@@ -202,3 +192,19 @@ def main():
         speech recognition (Whisper). The architecture you just traced through is the
         foundation of the current AI moment.
     """)
+
+
+def softmax(x, axis=-1):
+    e = np.exp(x - x.max(axis=axis, keepdims=True))
+    return e / e.sum(axis=axis, keepdims=True)
+
+
+def scaled_dot_product_attention(Q, K, V):
+    d_k = Q.shape[-1]
+    scores = Q @ K.T / np.sqrt(d_k)
+    weights = softmax(scores)
+    return weights @ V, weights
+
+
+if __name__ == "__main__":
+    main()
