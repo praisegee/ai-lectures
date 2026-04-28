@@ -3,9 +3,8 @@ import numpy as np
 
 def main():
     text("# Neural Networks")
-
     text("""
-        A neural network is a composition of simple functions —
+        A neural network is a composition of simple functions,
         linear transformations interleaved with nonlinearities.
 
         Stacked deep enough, they can approximate *any* continuous function
@@ -14,19 +13,17 @@ def main():
     """)
 
     text("## The neuron")
-
     text("""
         A single neuron computes:
 
         $$z = \\mathbf{w} \\cdot \\mathbf{x} + b, \\qquad a = \\sigma(z)$$
 
-        - $\\mathbf{w}$: weights — learned parameters
-        - $b$: bias — learned offset
-        - $\\sigma$: activation function — introduces nonlinearity
+        - $\\mathbf{w}$: weights (learned parameters)
+        - $b$: bias (learned offset)
+        - $\\sigma$: activation function (introduces nonlinearity)
         - $z$: pre-activation (weighted sum)
         - $a$: activation (output of the neuron)
     """)
-
     x = np.array([0.5, -1.2, 0.8, 2.1])   # one input example, 4 features  # @inspect x
     w = np.array([0.3, -0.7, 1.1, 0.2])   # @inspect w
     b = 0.5                                 # @inspect b
@@ -37,20 +34,18 @@ def main():
     text(f"Pre-activation z = **{z:.3f}**, after ReLU a = **{a:.3f}**")
 
     text("## Activation functions")
-
     text("""
         Without activation functions, every layer is just a linear transform.
-        Composing linear functions always gives another linear function — no matter
+        Composing linear functions always gives another linear function, no matter
         how many layers you stack, the whole network collapses to a single matrix.
 
         Activations break this linearity and give the network its expressive power.
         The three most common:
 
-        - **ReLU** $= \\max(0, z)$ — simple, fast, works well in most cases
-        - **Sigmoid** $= \\frac{1}{1 + e^{-z}}$ — outputs in (0, 1), good for probabilities
-        - **Tanh** $= \\frac{e^z - e^{-z}}{e^z + e^{-z}}$ — outputs in (-1, 1), zero-centered
+        - **ReLU** $= \\max(0, z)$: simple, fast, works well in most cases
+        - **Sigmoid** $= \\frac{1}{1 + e^{-z}}$: outputs in (0, 1), good for probabilities
+        - **Tanh** $= \\frac{e^z - e^{-z}}{e^z + e^{-z}}$: outputs in (-1, 1), zero-centered
     """)
-
     z_range = np.linspace(-4, 4, 80)  # @stepover
 
     plot({
@@ -76,19 +71,16 @@ def main():
     })
 
     text("## Layers")
-
     text("""
-        A *layer* applies a linear transform to all inputs simultaneously — one set of weights per output neuron.
+        A *layer* applies a linear transform to all inputs simultaneously, with one set of weights per output neuron.
         With $D_{\\text{in}}$ input features and $D_{\\text{out}}$ neurons, the weight matrix is $D_{\\text{in}} \\times D_{\\text{out}}$.
 
         In code this is just a matrix multiply: `output = input @ W + b`
     """)
-
     layer = Linear(4, 3, seed=42)   # @inspect layer
     out = layer(x)                   # @inspect out
 
     text("## Building a deep network")
-
     text("""
         A network is layers chained together. The output of one becomes the input of the next.
         We'll build a 3-layer network for classifying handwritten digits (10 classes).
@@ -100,19 +92,16 @@ def main():
         - **Hidden layer 2**: 128 neurons, ReLU activation
         - **Output**: 10 neurons, one per digit class (0–9)
     """)
-
     l1 = Linear(784, 256, seed=0)   # @inspect l1
     l2 = Linear(256, 128, seed=1)   # @inspect l2
     l3 = Linear(128, 10,  seed=2)   # @inspect l3
 
     text("## Forward pass")
-
     text("""
         A *forward pass* feeds an input through the network layer by layer to produce a prediction.
         Each layer transforms its input with a linear operation followed by a nonlinearity.
         The final layer produces raw scores called *logits*, which softmax converts to probabilities.
     """)
-
     np.random.seed(7)
     image = np.random.rand(784)   # simulated flattened 28×28 image  # @inspect image
 
@@ -127,7 +116,7 @@ def main():
     text(f"Predicted digit: **{predicted_digit}** with confidence **{confidence:.1%}**")
 
     note("""
-        With random weights the prediction is meaningless — confidence means nothing yet.
+        With random weights the prediction is meaningless, so confidence means nothing yet.
         Training adjusts all the weights so the correct digit gets high probability.
     """)
 
@@ -145,13 +134,11 @@ def main():
     })
 
     text("## Counting parameters")
-
     text("""
         Each layer has $D_{\\text{in}} \\times D_{\\text{out}}$ weights plus $D_{\\text{out}}$ biases.
         Our tiny digit classifier already has over 200,000 parameters.
         GPT-3 has 175 billion.
     """)
-
     params = {
         "layer 1 (784→256)": 784 * 256 + 256,
         "layer 2 (256→128)": 256 * 128 + 128,
@@ -162,10 +149,9 @@ def main():
     text(f"Total trainable parameters: **{total:,}**")
 
     text("## Hierarchical feature learning")
-
     text("""
-        What makes deep networks powerful is not the individual neurons —
-        it's that layers build on each other to learn increasingly abstract representations.
+        What makes deep networks powerful is not the individual neurons.
+        It's that layers build on each other to learn increasingly abstract representations.
 
         For a vision network trained on images:
         - **Layer 1** detects edges, corners, and color gradients
@@ -173,7 +159,7 @@ def main():
         - **Layer 3** combines shapes into object parts (wheels, eyes, ears)
         - **Deeper layers** combine parts into objects
 
-        Nobody designs these features — the network discovers them automatically
+        Nobody designs these features. The network discovers them automatically
         through training. This emergent hierarchy is what makes deep learning so powerful.
     """)
 

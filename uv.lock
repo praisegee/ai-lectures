@@ -13,17 +13,17 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lectrace", specifier = ">=1.0.9" },
+    { name = "lectrace", specifier = ">=1.1.1" },
     { name = "numpy" },
 ]
 
 [[package]]
 name = "lectrace"
-version = "1.0.9"
+version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6a/e1/c6ebdb16ac6df4c0dbc9d697be98f9dd118f0d789ef84bb581cd995c18a0/lectrace-1.0.9.tar.gz", hash = "sha256:9ef8420dc858a47c545a272781e2a31ea31492aae91bbacfb36570a1ccaaea62", size = 1468555, upload-time = "2026-04-24T18:41:19.147Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/78/e5d8a10514ea57d4f38aa6edac188094c2003d948d2445a802a6ac85ac30/lectrace-1.1.1.tar.gz", hash = "sha256:9839c164935caa2c01d857fa079014b48255c83ea83d2e17d20335377ad27a4c", size = 1477185, upload-time = "2026-04-28T08:40:19.561Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e3/de/8d96ad321a5c3208edf550875506fcff880e7500d546f084adf7c86350a3/lectrace-1.0.9-py3-none-any.whl", hash = "sha256:8a0b424c803148a06bab86bd2a3ff9280df13889677b10c6e36c37c4a6ae79f6", size = 1413930, upload-time = "2026-04-24T18:41:17.446Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/db/572ee435141043c20ab5caa089603047a5f388761cb7e55291a0da5e4984/lectrace-1.1.1-py3-none-any.whl", hash = "sha256:891aaf816709c80d562443cb5a59f2a9dca1f074df988da8b5cc7bceaccd963e", size = 1419541, upload-time = "2026-04-28T08:40:18.011Z" },
 ]
 
 [[package]]

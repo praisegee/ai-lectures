@@ -3,25 +3,23 @@ import numpy as np
 
 def main():
     text("# Attention and Transformers")
-
     text("""
         Attention is the mechanism that lets a model decide which parts of the input
         to focus on when producing each output.
 
-        It is the core innovation of the **Transformer** — the architecture behind
+        It is the core innovation of the **Transformer**, the architecture behind
         GPT, BERT, Claude, Gemini, and every major language model today.
         Before attention, models struggled with long-range dependencies.
         Attention solved that completely.
     """)
 
     text("## The problem attention solves")
-
     text("""
         In a sequence, not every word is equally relevant to every other word.
 
         > *"The cat sat on the mat because **it** was comfortable."*
 
-        Resolving "it" requires attending back to "cat" — not "mat" or "sat".
+        Resolving "it" requires attending back to "cat", not "mat" or "sat".
         Earlier architectures (RNNs, LSTMs) had to compress the entire past into
         a fixed-size vector, losing information over long distances.
 
@@ -30,7 +28,6 @@ def main():
     """)
 
     text("## Queries, Keys, and Values")
-
     text("""
         Each token produces three learned projections:
 
@@ -43,21 +40,18 @@ def main():
     """)
 
     text("## Scaled dot-product attention")
-
     text("""
         $$\\text{Attention}(Q, K, V) = \\text{softmax}\\!\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V$$
 
-        The scaling by $\\sqrt{d_k}$ is critical — without it, dot products grow large
+        The scaling by $\\sqrt{d_k}$ is critical. Without it, dot products grow large
         in high dimensions, pushing softmax into saturation where gradients vanish.
     """)
 
     text("## Step-by-step: three tokens")
-
     text("""
         Let's trace attention on a tiny sequence: `[the, cat, sat]`
         Each token is embedded into a 4-dimensional vector.
     """)
-
     np.random.seed(3)
     d_model = 4
     tokens = ["the", "cat", "sat"]  # @inspect tokens
@@ -77,22 +71,19 @@ def main():
     V = embeddings @ W_V   # @inspect V
 
     text("## Computing attention scores")
-
     d_k = d_model
     raw_scores = Q @ K.T / np.sqrt(d_k)   # @inspect raw_scores
 
     text("""
         Each row corresponds to one token attending to all others.
-        Higher score = more attention. Negative = less relevant.
+        Higher score means more attention. Negative means less relevant.
     """)
-
     attention_weights = softmax(raw_scores)   # @inspect attention_weights
 
     text("""
-        After softmax, each row sums to 1 — a probability distribution over which
+        After softmax, each row sums to 1, giving a probability distribution over which
         tokens to attend to. This is what gets visualized in attention heatmaps.
     """)
-
     output = attention_weights @ V   # @inspect output
 
     text("""
@@ -103,7 +94,7 @@ def main():
 
     plot({
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "title": "Attention weights — row=query, col=key",
+        "title": "Attention weights (row=query, col=key)",
         "width": 220,
         "height": 220,
         "data": {"values": [
@@ -120,10 +111,9 @@ def main():
     })
 
     text("## Multi-head attention")
-
     text("""
-        One attention head captures one type of relationship —
-        syntactic structure, coreference, topic similarity, etc.
+        One attention head captures one type of relationship,
+        such as syntactic structure, coreference, or topic similarity.
 
         **Multi-head attention** runs $H$ heads in parallel, each with its own $W_Q, W_K, W_V$,
         then concatenates and projects the results:
@@ -132,7 +122,6 @@ def main():
 
         Different heads learn to look for different relationship types simultaneously.
     """)
-
     n_heads = 2
     d_head = d_model // n_heads   # @inspect d_head
 
@@ -150,44 +139,41 @@ def main():
     note("GPT-3: 96 attention heads, each operating in 128D. 175 billion parameters total.")
 
     text("## The full Transformer block")
-
     text("""
         A Transformer layer wraps multi-head attention with three additions that
         make training stable and deep stacking possible:
 
-        1. **Residual connection**: $x \\leftarrow x + \\text{Attention}(x)$
-           — gradients flow directly through the skip connection, preventing vanishing gradients
+        1. **Residual connection**: $x \\leftarrow x + \\text{Attention}(x)$,
+           gradients flow directly through the skip connection, preventing vanishing gradients
 
-        2. **Layer normalization**: applied after each sub-layer
-           — stabilizes the distribution of activations during training
+        2. **Layer normalization**: applied after each sub-layer,
+           stabilizes the distribution of activations during training
 
-        3. **Feed-forward network**: two linear layers applied to each token independently
-           — adds per-token capacity beyond what attention provides
+        3. **Feed-forward network**: two linear layers applied to each token independently,
+           adds per-token capacity beyond what attention provides
 
-        Stack 12 of these blocks → BERT. Stack 96 → GPT-3.
+        Stack 12 of these blocks to get BERT. Stack 96 to get GPT-3.
     """)
 
     text("## Why Transformers won")
-
     reasons = {
-        "parallelism": "all tokens attend simultaneously — no sequential bottleneck like RNNs",
+        "parallelism": "all tokens attend simultaneously, no sequential bottleneck like RNNs",
         "long range":  "any token attends to any other in O(1) steps regardless of distance",
         "scale":       "more compute + more data = reliably better performance",
         "pretraining": "train once on internet text, fine-tune for any downstream task",
     }  # @inspect reasons
 
     text("## From attention to modern AI")
-
     text("""
         GPT models are **decoder-only Transformers** trained on one objective:
         predict the next token. Given enough text and compute, this simple task
         forces the model to internalize grammar, facts, reasoning, and code.
 
-        The attention mechanism is what lets it use context from thousands of tokens back —
+        The attention mechanism lets it pull context from thousands of tokens back,
         reaching across an entire document to resolve ambiguity, maintain consistency,
         and build coherent arguments.
 
-        Everything in modern AI that isn't a neural network backbone is the attention
+        Everything in modern AI that isn't a neural network backbone uses the attention
         mechanism: image generation (DiT), protein folding (AlphaFold), code synthesis (Copilot),
         speech recognition (Whisper). The architecture you just traced through is the
         foundation of the current AI moment.

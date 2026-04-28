@@ -3,10 +3,9 @@ import numpy as np
 
 def main():
     text("# Backpropagation")
-
     text("""
         We know gradient descent needs $\\nabla_{\\mathbf{w}} L$ to update each weight.
-        But a network can have millions of parameters — how do we compute all those
+        But a network can have millions of parameters, so how do we compute all those
         gradients efficiently?
 
         **Backpropagation** is the algorithm that does it.
@@ -15,7 +14,6 @@ def main():
     """)
 
     text("## The chain rule")
-
     text("""
         If $L = f(g(x))$, the chain rule gives us:
 
@@ -23,11 +21,10 @@ def main():
 
         Backpropagation applies this rule across every layer of the network,
         reusing intermediate results so no computation is wasted.
-        That's why it's efficient — each gradient is computed exactly once.
+        That's why it's efficient: each gradient is computed exactly once.
     """)
 
     text("## Loss function: cross-entropy")
-
     text("""
         For classification with $C$ classes, we use cross-entropy loss:
 
@@ -35,24 +32,21 @@ def main():
 
         where $p_y$ is the predicted probability of the true class $y$.
 
-        - Correct prediction with high confidence → $L \\approx 0$
-        - Wrong prediction with high confidence → $L$ is large
-        - Uniform prediction (uncertain) → $L = \\log C$
+        - Correct prediction with high confidence gives $L \\approx 0$
+        - Wrong prediction with high confidence gives large $L$
+        - Uniform prediction (uncertain) gives $L = \\log C$
     """)
-
     probs = np.array([0.05, 0.02, 0.88, 0.03, 0.02])  # 5-class example  # @inspect probs
     y_true = 2                                          # @inspect y_true
 
     loss = cross_entropy(probs, y_true)   # @inspect loss
 
     text("## A minimal two-layer network")
-
     text("""
         Let's trace the full forward pass then backpropagate by hand.
-        This is the same math that PyTorch and JAX do automatically —
+        This is the same math that PyTorch and JAX do automatically;
         understanding it once is worth more than years of black-box usage.
     """)
-
     np.random.seed(42)
     x  = np.array([0.6, -0.4, 1.2])     # input, 3 features  # @inspect x
     W1 = np.random.randn(3, 4) * 0.5    # @inspect W1
@@ -63,17 +57,15 @@ def main():
     y_true_2 = 1   # class 1 is correct  # @inspect y_true_2
 
     text("## Forward pass")
-
     z1 = x @ W1 + b1      # @inspect z1
     a1 = relu(z1)          # @inspect a1
     z2 = a1 @ W2 + b2     # @inspect z2
     probs2 = softmax(z2)   # @inspect probs2
     loss2 = cross_entropy(probs2, y_true_2)  # @inspect loss2
 
-    text(f"Forward pass — predicted class {int(np.argmax(probs2))}, loss = **{loss2:.4f}**")
+    text(f"Forward pass: predicted class {int(np.argmax(probs2))}, loss = **{loss2:.4f}**")
 
-    text("## Backward pass — output layer")
-
+    text("## Backward pass: output layer")
     text("""
         The gradient of cross-entropy + softmax w.r.t. the logits $z_2$ is beautifully simple:
 
@@ -82,15 +74,13 @@ def main():
         Subtract 1 from the predicted probability of the true class. That's it.
         All the complexity of softmax + log cancels out to this clean expression.
     """)
-
     dL_dz2 = probs2.copy()    # @inspect dL_dz2
     dL_dz2[y_true_2] -= 1
 
     dL_dW2 = np.outer(a1, dL_dz2)   # @inspect dL_dW2
     dL_db2 = dL_dz2.copy()           # @inspect dL_db2
 
-    text("## Backward pass — hidden layer")
-
+    text("## Backward pass: hidden layer")
     text("""
         The gradient flows back through W2, then through the ReLU gate
         (which zeroes out gradients for negative pre-activations),
@@ -99,7 +89,6 @@ def main():
         The ReLU gradient is a binary mask: 1 where `z1 > 0`, 0 elsewhere.
         Neurons that were inactive during the forward pass receive no gradient signal.
     """)
-
     dL_da1 = dL_dz2 @ W2.T           # @inspect dL_da1
     dL_dz1 = dL_da1 * relu_grad(z1)  # @inspect dL_dz1
 
@@ -107,7 +96,6 @@ def main():
     dL_db1 = dL_dz1.copy()           # @inspect dL_db1
 
     text("## One gradient descent step")
-
     lr = 0.1   # @inspect lr
 
     W1 -= lr * dL_dW1
@@ -121,7 +109,7 @@ def main():
     probs_new = softmax(z2_new)
     loss_new  = cross_entropy(probs_new, y_true_2)   # @inspect loss_new
 
-    text(f"After one update — loss: **{loss2:.4f}** → **{loss_new:.4f}** ✓")
+    text(f"After one update: loss **{loss2:.4f}** → **{loss_new:.4f}** ✓")
 
     note("""
         In practice, autograd (PyTorch, JAX, TensorFlow) builds a computation graph
@@ -130,18 +118,16 @@ def main():
     """)
 
     text("## Mini-batch training loop")
-
     text("""
-        Real training repeats backpropagation over many random **mini-batches** —
+        Real training repeats backpropagation over many random **mini-batches**,
         small subsets of the dataset typically of size 32–512.
 
         This is **Stochastic Gradient Descent (SGD)**: the gradient of a mini-batch
         is a noisy but unbiased estimate of the full gradient. The noise actually
-        helps — it prevents the optimizer from getting stuck in sharp minima.
+        helps, since it prevents the optimizer from getting stuck in sharp minima.
 
         One full pass over all mini-batches is called an **epoch**.
     """)
-
     np.random.seed(0)
     N, D = 200, 3
     X_data = np.random.randn(N, D)
@@ -169,7 +155,6 @@ def main():
     })
 
     text("## Why backprop is efficient")
-
     text("""
         A naive approach would compute each gradient separately using finite differences:
         perturb parameter $i$ by $\\epsilon$, measure how loss changes, repeat for every parameter.

@@ -4,24 +4,21 @@ import numpy as np
 
 def main():
     text("# Language Models")
-
     text("""
         A language model assigns a probability to a sequence of tokens.
         Equivalently, it predicts the next token given everything before:
 
         $$P(x_1, x_2, \\ldots, x_n) = \\prod_{t=1}^{n} P(x_t \\mid x_1, \\ldots, x_{t-1})$$
 
-        This is the foundation of every LLM — GPT, Llama, Gemini, Claude.
+        This is the foundation of every LLM: GPT, Llama, Gemini, Claude.
         They all do one thing: predict the next token, one at a time.
     """)
 
     text("## Tokenisation")
-
     text("""
-        Before modelling, text is broken into **tokens** — subword units in
+        Before modelling, text is broken into **tokens**, which are subword units in
         real models, single characters here for simplicity.
     """)
-
     corpus = "the cat sat on the mat the cat ate the rat"  # @inspect corpus
     chars = sorted(set(corpus))                             # @inspect chars
     vocab_size = len(chars)                                 # @inspect vocab_size
@@ -33,8 +30,7 @@ def main():
 
     text(f"Vocabulary: {vocab_size} characters. Corpus: {len(tokens)} tokens.")
 
-    text("## Bigram Model — Count Co-occurrences")
-
+    text("## Bigram Model: Count Co-occurrences")
     text("""
         The simplest language model: count how often each character follows every other.
 
@@ -42,7 +38,6 @@ def main():
 
         This is a $|V| \\times |V|$ table of transition probabilities.
     """)
-
     counts = count_bigrams(tokens, vocab_size)  # @inspect counts @stepover
     probs = counts / counts.sum(axis=1, keepdims=True)  # @inspect probs
 
@@ -71,29 +66,25 @@ def main():
         },
     })
 
-    text("## Generating Text — Sampling")
-
+    text("## Generating Text: Sampling")
     text("""
         To generate text, we sample the next token from the model's distribution
-        and feed it back in as context — **autoregressive generation**.
+        and feed it back in as context. This is **autoregressive generation**.
     """)
-
     generated = generate(probs, itos, stoi, seed_char="t", n=40)  # @inspect generated @stepover
 
     text(f"Generated: `{generated}`")
 
-    text("## Temperature — Controlling Randomness")
-
+    text("## Temperature: Controlling Randomness")
     text("""
         **Temperature** $T$ reshapes the probability distribution before sampling:
 
         $$P_T(c) = \\frac{P(c)^{1/T}}{\\sum_{c'} P(c')^{1/T}}$$
 
-        - $T \\to 0$: deterministic — always pick the most likely token
+        - $T \\to 0$: deterministic, always pick the most likely token
         - $T = 1$: sample from the learned distribution as-is
-        - $T > 1$: flatten the distribution — more random and creative
+        - $T > 1$: flatten the distribution, more random and creative
     """)
-
     low_T  = generate(probs, itos, stoi, seed_char="t", n=40, temperature=0.1)   # @inspect low_T @stepover
     high_T = generate(probs, itos, stoi, seed_char="t", n=40, temperature=2.5)  # @inspect high_T @stepover
 
@@ -102,22 +93,19 @@ def main():
 
     note("Most production LLMs default to T ≈ 0.7–1.0. Lower T for factual tasks, higher for creative ones.")
 
-    text("## Perplexity — Measuring Model Quality")
-
+    text("## Perplexity: Measuring Model Quality")
     text("""
         **Perplexity** measures how surprised the model is by the data.
-        Lower is better — a perfect model has perplexity 1, a uniform random
+        Lower is better. A perfect model has perplexity 1, and a uniform random
         model has perplexity $|V|$.
 
         $$\\text{PPL} = \\exp\\!\\left(-\\frac{1}{N} \\sum_{t=1}^{N} \\log P(x_t \\mid x_{t-1})\\right)$$
     """)
-
     ppl = perplexity(probs, tokens)  # @inspect ppl @stepover
 
     text(f"Bigram perplexity: **{ppl:.2f}** (vs {vocab_size} for a random model)")
 
     text("## From Bigrams to Transformers")
-
     text("""
         The bigram model looks back exactly 1 token. Real LLMs look back thousands:
 
@@ -128,7 +116,7 @@ def main():
         | GPT-3 | 2,048 tokens | 175B |
         | GPT-4 | 128,000 tokens | ~1T |
 
-        The core objective — predict $P(x_t \\mid x_{<t})$ — never changes.
+        The core objective, predicting $P(x_t \\mid x_{<t})$, never changes.
         The Transformer just makes it work at massive context and scale.
     """)
 

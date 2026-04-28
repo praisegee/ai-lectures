@@ -3,19 +3,17 @@ import numpy as np
 
 def main():
     text("# Gradient Descent")
-
     text("""
         Training a model means finding parameters that minimize a loss function.
-        Gradient descent is the algorithm that does it — follow the slope of the
+        Gradient descent is the algorithm that does it: follow the slope of the
         loss surface downhill, one step at a time.
 
         It is arguably the most important algorithm in all of machine learning.
-        Every model you've heard of — GPT, Stable Diffusion, AlphaFold — was
+        Every model you've heard of (GPT, Stable Diffusion, AlphaFold) was
         trained with some variant of gradient descent.
     """)
 
     text("## The loss function")
-
     text("""
         A loss function measures how wrong the model's predictions are.
         For regression, we use **Mean Squared Error**:
@@ -23,19 +21,16 @@ def main():
         $$L(\\mathbf{w}) = \\frac{1}{N}\\sum_{i=1}^{N}(\\hat{y}_i - y_i)^2$$
 
         where $\\hat{y}_i$ is the prediction and $y_i$ is the true value.
-        Perfect predictions → $L = 0$. Worse predictions → larger $L$.
+        Perfect predictions give $L = 0$. Worse predictions give larger $L$.
     """)
-
     y_true = np.array([45, 52, 61, 70, 75, 82, 88, 95], dtype=float)  # @inspect y_true
 
     text("## Starting with random weights")
-
     text("""
         Before training, we initialize `w` and `b` randomly.
-        The model makes terrible predictions — that's expected.
+        The model makes terrible predictions, which is expected.
         Training will fix it.
     """)
-
     np.random.seed(0)
     w = np.random.randn()   # @inspect w
     b = np.random.randn()   # @inspect b
@@ -45,12 +40,11 @@ def main():
     y_pred = predict(X, w, b)        # @inspect y_pred
     loss = mse_loss(y_pred, y_true)  # @inspect loss
 
-    text(f"Initial loss: **{loss:.2f}** — random weights predict poorly.")
+    text(f"Initial loss: **{loss:.2f}**. Random weights predict poorly.")
 
     text("## The gradient")
-
     text("""
-        The gradient $\\nabla L$ is a vector of partial derivatives — one per parameter —
+        The gradient $\\nabla L$ is a vector of partial derivatives, one per parameter,
         pointing in the direction of **steepest increase** of the loss.
 
         We want the loss to *decrease*, so we step in the **opposite** direction.
@@ -63,22 +57,20 @@ def main():
     """)
 
     text("## The update rule")
-
     text("""
         $$w \\leftarrow w - \\eta\\,\\frac{\\partial L}{\\partial w}$$
 
-        where $\\eta$ (eta) is the **learning rate** — a small positive number controlling
+        where $\\eta$ (eta) is the **learning rate**, a small positive number controlling
         how large each step is. Too large and we overshoot. Too small and training is slow.
     """)
 
-    text("## Training loop — watch the loss fall")
-
+    text("## Training loop")
     w, b, loss_history = _train(X, y_true, w, b)  # @stepover
     w = float(w)    # @inspect w
     b = float(b)    # @inspect b
     final_loss = loss_history[-1]  # @inspect final_loss
 
-    text(f"After 200 steps — loss: **{final_loss:.2f}**, w: **{w:.3f}**, b: **{b:.3f}**")
+    text(f"After 200 steps: loss = **{final_loss:.2f}**, w = **{w:.3f}**, b = **{b:.3f}**")
 
     plot({
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -94,17 +86,15 @@ def main():
     })
 
     text("## The learning rate matters enormously")
-
     text("""
         The learning rate is the most important hyperparameter in training.
 
-        - **Too large** — steps overshoot the minimum, loss oscillates or diverges
-        - **Too small** — converges correctly but wastes compute
-        - **Just right** — smooth descent to a good minimum
+        - **Too large**: steps overshoot the minimum, loss oscillates or diverges
+        - **Too small**: converges correctly but wastes compute
+        - **Just right**: smooth descent to a good minimum
 
         In practice: start at `1e-3`, halve it if training becomes unstable.
     """)
-
     results = _compare_lrs(X, y_true, [0.1, 0.01, 0.001, 0.0001])  # @stepover
 
     plot({
@@ -128,17 +118,16 @@ def main():
     note("A common heuristic: start at 1e-3, reduce by 10× if training is unstable.")
 
     text("## What we learned")
-
     takeaways = [
         "loss functions quantify how wrong the model is",
         "gradients point toward steepest increase in loss",
         "we step opposite the gradient, scaled by learning rate",
-        "iterate until convergence — that's training",
+        "iterate until convergence, that's training",
     ]  # @inspect takeaways
 
     text("""
-        Everything in modern ML training — Adam, momentum, learning rate schedules,
-        gradient clipping — is an enhancement on top of this basic loop.
+        Everything in modern ML training (Adam, momentum, learning rate schedules,
+        gradient clipping) is an enhancement on top of this basic loop.
         The core idea never changes.
     """)
 
